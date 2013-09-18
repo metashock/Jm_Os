@@ -6,7 +6,7 @@ class Jm_Os_Pidfile
     /**
      *
      */
-    protected $location;
+    protected $filename;
 
 
     /**
@@ -18,9 +18,9 @@ class Jm_Os_Pidfile
     /**
      *
      */
-    public function __construct($location) {
-        Jm_Util_Checktype::check('string', $location);
-        $this->location = $location;
+    public function __construct($filename) {
+        Jm_Util_Checktype::check('string', $filename);
+        $this->filename = $filename;
     }
 
 
@@ -29,20 +29,35 @@ class Jm_Os_Pidfile
      */
     public function openExclusive() {
         $this->fd = @fopen($this->filename, 'w+');
-        if(!is_resource($this->pidfile)) {
+        if(!is_resource($this->fd)) {
             throw new Exception(
-                'Failed to create pidfile (' . $this->pidfile . ')'
+                'Failed to create pidfile (' . $this->filename . ')'
             );
         }
 
-        // if a lock cannot obtained
-        if(!flock($this->pidfile, LOCK_EX | LOCK_NB)) {
-            $pid = fgets($this->pidfile);
-            $this->console()->write('Daemon is already running (', 'red');
-            $this->console()->write($phishpid, 'red,bold');
-            $this->console()->writeln(')', 'red');
-            return;
+        // Try to obtain an exclusive lock for the file
+        // the function will not block because of LOCK_NB
+        if(!flock($this->fd, LOCK_EX | LOCK_NB)) {
+            $this->pid = fgets($this->fd);
+            return FALSE;
         }
+        return TRUE;
+    }
+
+
+    /**
+     *
+     */
+    public function close() {
+        fclose($this->fd);
+    }
+
+
+    /**
+     *
+     */
+    public function content() {
+        return $this->pid;
     }
 }
 
