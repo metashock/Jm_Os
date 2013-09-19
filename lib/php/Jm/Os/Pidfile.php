@@ -69,7 +69,7 @@ class Jm_Os_Pidfile
      * @return boolean
      */
     public function open() {
-        $this->fd = @fopen($this->filename, 'r+');
+        $this->fd = fopen($this->filename, 'a+');
         if(!is_resource($this->fd)) {
             throw new Exception(
                 'Failed to create pidfile (' . $this->filename . ')'
