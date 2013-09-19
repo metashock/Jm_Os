@@ -1,6 +1,6 @@
 <?php
 
-abstract class Phish_Daemon
+abstract class Jm_Os_Daemon
 implements Jm_Configurable
 {
 
@@ -9,10 +9,14 @@ implements Jm_Configurable
      */
     protected $daemonPid;
 
+
+    protected $pidfile;
+
+
     /**
      *
      */
-    public function __construct($configuration) {
+    public function __construct($configuration = NULL) {
         $this->configure($configuration);
     }
 
@@ -34,12 +38,11 @@ implements Jm_Configurable
                 throw new Exception('Forking failed. Cannot spawn daemon');
             case  0 :
                 $this->daemon();
+                echo 'finished';
                 exit(1); // should never happen
             default:
+                $this->pidfile->content((string)$pid);
                 $this->daemonPid = $pid;
-                $this->console->write('Spawned daemon (', 'green');
-                $this->console->write($pid, 'green,bold');
-                $this->console->writeln(')', 'green');
                 return $this;
         }        
     }
@@ -52,9 +55,16 @@ implements Jm_Configurable
      * opened for reading / writing
      */
     public function start($exclusive = TRUE) {
-        $pidfile = new Jm_Os_Pidfile(
-            $this->getPidfileLocation(), 'phish'
+        $this->pidfile = new Jm_Os_Pidfile(
+            $this->getPidfileLocation()
         );
+
+        $this->pidfile->open();
+        if($this->pidfile->lock()) {
+            $this->daemonize(); 
+        } else {
+            $this->log->error('Failed to start Daemon');
+        }
     }
 
 
@@ -71,78 +81,34 @@ implements Jm_Configurable
      *
      */
     public function stop() {
-        if(!file_exists($this->getPidfileLocation())) {
-            $this->console->writeln(
-                'pidfile \'' .
-                $this->getPidfileLocation() .
-                '\' not found',
-            'yellow');
-            return;
+        $pidfile = new Jm_Os_Pidfile(
+            $this->getPidfileLocation()
+        );
+
+        $content = $pidfile->open()
+          ->content();
+
+        if(!is_numeric($content)) {
+            throw new Exception('Bad content in pidfile. Expected a pid');            
         }
 
-        if(!is_readable($this->getPidfileLocation())) {
-            $this->console->writeln(
-                'pidfile \'' .
-                $this->getPidfileLocation() .
-                '\' not readable',
-            'yellow');
-            return;
+        $pid = (integer) $content;
+
+        if(!posix_kill($pid, 0)) {
+            $this->log->warning(
+                'Daemon not running and therefore not stopped'
+            );
         }
 
-        // the trim() is because if someone has editied the pidfile
-        // with a text editor
-        $pid = trim(file_get_contents($this->getPidfileLocation()));
+        echo 'Sending SIGTERM to ' . $pid, PHP_EOL;
 
-        if(!is_numeric($pid)) {
-            $this->console->writeln(
-                'pidfile \'' .
-                $this->getPidfileLocation() .
-                '\' contains invalid content. Expect is a pid',
-            'yellow');
-            return; 
-        }
-
-        $pid = (integer) $pid;
-        
-        // check if the process is still running
-        $ret = posix_kill($pid, 0);
-        if($ret === FALSE) {
-             $this->console->writeln(
-                'The process (' . $pid .
-                ') isn\'t running and therefore not stopping it',
-            'yellow');
-            return;            
-        }
-
-        $this->console->write('Stopping daemon (', 'yellow');
-        $this->console->write($pid, 'yellow,bold');
-        $this->console->writeln(') ', 'yellow');
-
-        $this->console->writeln('Sending SIGTERM to ' . $pid);
         posix_kill($pid, SIGTERM);
-        $this->console->write('Waiting for process to exit ');
 
-        $try = 0;
-        $maxtries = 10;
-        while($try < $maxtries) {
-            $this->console()->write('.');
-            $ret = posix_kill($pid, 0);
-            if($ret === FALSE) {
-                $this->console()->writeln(' [OK]', 'green');
-                break; 
-            }
-            $try++;
-            sleep(1);
+        if(!posix_kill($pid, 0)) {
+            $this->log->warning(
+                'Daemon still running'
+            );
         }
-
-        if($try === $maxtries) {
-            $this->console->writeln('');
-            $this->console->write('Sending');
-            $this->console->writeln(' SIGKILL', 'red');
-            posix_kill($pid, SIGKILL);
-        } 
-            
-        unlink($this->getPidfileLocation());
     }
 
 
@@ -161,7 +127,7 @@ implements Jm_Configurable
      * @return Phish_Daemon
      */
     public function configure($configuration) {
-        Jm_Util_Checktype::check(array('Jm_Configuration', 'array'),
+        Jm_Util_Checktype::check(array('Jm_Configuration', 'array', 'NULL'),
             $configuration);
         $this->configuration = $configuration;
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpdoc>
-  <title>Jm_Os_Inotify</title>
+  <title>Jm_Os_Daemon</title>
   <markers>
     <item>TODO</item>
     <item>FIXME</item>
