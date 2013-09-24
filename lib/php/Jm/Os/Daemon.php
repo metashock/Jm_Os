@@ -119,6 +119,16 @@ implements Jm_Configurable
             case  0 :
                 // detach from terminal by obtaining a new process group
                 posix_setsid();
+
+                // detach console log. from this point all regular logging
+                // goes to the log file. Note: If a fatal error occurs it
+                // will be still sent to the console
+                $this->log = new Jm_Log();
+                $logfile = $this->configuration->logging->logfile;
+                if(!empty($logfile)) {
+                    $this->log->attach(new Jm_Log_FileObserver($logfile));
+                }
+
                 try {
                     $this->daemon();
                 } catch (Exception $e) {
@@ -150,6 +160,7 @@ implements Jm_Configurable
         );
 
         if($this->pidfile->open()->lock()) {
+            $this->log('Starting daemon', Jm_Log_Level::NOTICE);
             $this->daemonize();
             return TRUE;
         } else {
@@ -295,10 +306,6 @@ implements Jm_Configurable
         if(is_null($log)) {
             $this->log = new Jm_Log();
             $this->log->attach(new Jm_Log_ConsoleObserver());
-            $logfile = $this->configuration->get('log');
-            if(!empty($logfile)) {
-                $this->log->attach(new Jm_Log_FileObserver($logfile));
-            }
         } else {
             $this->log = $log;
         }
