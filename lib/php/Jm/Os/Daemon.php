@@ -208,7 +208,7 @@ implements Jm_Configurable
             sleep(1);
         }
 
-        if($c === 5) {
+        if($c === 6) {
             throw new Exception('Failed to shutdown daemon');
         }
 
