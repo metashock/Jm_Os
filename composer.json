@@ -1,0 +1,22 @@
+{
+    "name"          : "metashock/jm_os",
+    "version"       : "0.1.0",
+    "license"       : "BSD-3",
+    "description"   : "Run and control PHP deamons",
+    "minimum-stability" : "beta",
+
+    "repositories"  : {
+        "metashock" : {
+            "type"   : "pear",
+            "url"    : "http://www.metashock.de/pear",
+            "strict" : true
+        }
+    },
+
+    "require"       : {
+        "pear-metashock/jm_autoloader" : "*",
+		"pear-metashock/jm_util": "*",
+		"pear-metashock/jm_configuration" : "*"
+    }
+}
+

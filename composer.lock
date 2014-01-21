@@ -1,0 +1,106 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "f1669a1e662cccfd88971f397ac8f32e",
+    "packages": [
+        {
+            "name": "pear-www.metashock.de/pear/Jm_Autoloader",
+            "version": "0.3.1",
+            "dist": {
+                "type": "file",
+                "url": "http://www.metashock.de/pear/get/Jm_Autoloader-0.3.1.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "php": ">=5.1.2.0"
+            },
+            "replace": {
+                "pear-metashock/jm_autoloader": "== 0.3.1.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "description": "Implementation of the Spl autoload meachanism."
+        },
+        {
+            "name": "pear-www.metashock.de/pear/Jm_Configuration",
+            "version": "0.1.3",
+            "dist": {
+                "type": "file",
+                "url": "http://www.metashock.de/pear/get/Jm_Configuration-0.1.3.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "pear-www.metashock.de/pear/jm_autoloader": ">=0.2.2.0",
+                "pear-www.metashock.de/pear/jm_util": ">=0.1.2.0",
+                "php": ">=5.3.0.0"
+            },
+            "replace": {
+                "pear-metashock/jm_configuration": "== 0.1.3.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "description": "Jm_Configuration provides a transparent access to various types of configuration files or containers. Like arrays, .ini files. To be extended"
+        },
+        {
+            "name": "pear-www.metashock.de/pear/Jm_Util",
+            "version": "0.1.2",
+            "dist": {
+                "type": "file",
+                "url": "http://www.metashock.de/pear/get/Jm_Util-0.1.2.tgz",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "pear-www.metashock.de/pear/jm_autoloader": ">=0.2.2.0",
+                "php": ">=5.3.0.0"
+            },
+            "replace": {
+                "pear-metashock/jm_util": "== 0.1.2.0"
+            },
+            "type": "pear-library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "include-path": [
+                "/"
+            ],
+            "description": "Currently the package contains only the Checktype class, providing a simple interface to typechecks."
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "beta",
+    "stability-flags": [
+
+    ],
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}
